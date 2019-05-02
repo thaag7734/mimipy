@@ -67,7 +67,7 @@ while not done:
     if not re.search(r"^<[a-z0-9 =\"]+/>$", line):
         lineError = True
     if not lineError:
-        if re.fullmatch("^<note[a-z0-9 =\"]+/>$", line):
+        if re.search("^<note[a-z0-9 =\"]+/>$", line):
             note = Note()
             letterMatch = re.search("^.+letter=\"([a-z])\"", line)
             modMatch = re.search("^.+mod=\"([sf])\"", line)
