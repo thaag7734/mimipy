@@ -133,6 +133,8 @@ while not done:
         elif re.search("^<chstep(?: )?/>", line):
             chstep = ChStep()
             music.add(chstep)
+        else:
+            lineError = True
     elif line == "done":
         done = True
         music.display()
