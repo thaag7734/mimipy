@@ -62,6 +62,7 @@ while not done:
 			keyMatch = re.search(r"^.+ key=\"([a-g](?:[sfn])?)\"", line)
 			tstopMatch = re.search(r"^.+ tstop=(\d)", line)
 			tsbtmMatch = re.search(r"^.+ tsbtm=(\d)", line)
+			tuningMatch = re.search(r"^.+ a=((?:\d)\.\d+|\d)", line)
 			if tempoMatch:
 				prop.tempo = tempoMatch[1]
 			if keyMatch:
@@ -73,6 +74,8 @@ while not done:
 				prop.tstop = tstopMatch[1]
 			if tsbtmMatch:
 				prop.tsbtm = tsbtmMatch[1]
+			if tuningMatch:
+				prop.a = tuningMatch[1]
 			music.add(prop)
 		elif re.search(r"^<chstep(?: )?/>$", line):
 			chstep = ChStep()
