@@ -1,6 +1,8 @@
 import re
 from objects import Note, ChNote, Rest, ChRest, Properties, ChStep
 
+chrestEvent = threading.Event()
+
 FILTERS = {
 	"line": re.compile(r"^<[a-z0-9 =\"]+/>$"),
 	"note": re.compile(r"^<note [a-z0-9 =\"]+/>$"),
@@ -96,6 +98,7 @@ def getLineObject(line, origLine):
 			raise LineError("Malformed input at line '%s'" % origLine)
 				
 def playList(content):
+	global chrestEvent
 	tempo = 0
 	key = None
 	timesig = (None, None)
@@ -109,4 +112,10 @@ def playList(content):
 			a = obj.a
 		elif type(obj) == Note:
 			obj.play(a, tempo, key)
-			
+		elif type(obj) == ChNote:
+			if not chrestEvent.isSet()
+			obj.play(a, tempo, key)
+		elif type(obj) == Rest:
+			obj.rest(a, tempo)
+		elif type(obj) == ChRest:
+			obj.rest(a, tempo, e)
