@@ -7,6 +7,7 @@ SEMITONES = {
 	"ef": 3,
 	"en": 4,
 	"es": 5,
+	"ff": 4,
 	"fn": 5,
 	"fs": 6,
 	"gf": 6,
