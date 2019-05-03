@@ -139,7 +139,7 @@ while not done:
 			if tsbtmMatch:
 				prop.tsbtm = tsbtmMatch[1]
 			music.add(prop)
-		elif re.search("^<chstep(?: )?/>", line):
+		elif re.search("^<chstep(?: )?/>$", line):
 			chstep = ChStep()
 			music.add(chstep)
 		else:
