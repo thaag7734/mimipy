@@ -1,4 +1,5 @@
 SEMITONES = {
+	"cn": 0,
 	"cs": 1,
 	"df": 1,
 	"dn": 2,
