@@ -154,4 +154,4 @@ def mainMenu(p):
 			print("File '%s' does not exist." % filename)
 	p.terminate()
 
-mainMenu()
+mainMenu(p)
