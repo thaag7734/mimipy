@@ -77,7 +77,7 @@ class Properties:
 		self.tempo = int(tempo)
 		self.key = key
 		self.timesig = (int(tstop),int(tsbtm))
-		self.a = int(a)
+		self.a = float(a)
 
 class Music:
 	def __init__(self, prop=Properties()):
