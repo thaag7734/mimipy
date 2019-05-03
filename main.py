@@ -6,10 +6,9 @@ music = Music()
 
 while not done:
 	lineError = False
-	line = input("Enter line:\n").lower()
-	if not re.search(r"^<[a-z0-9 =\"]+/>$", line):
-		lineError = True
-	if not lineError:
+	origLine = input("Enter line:\n")
+	line = origLine.lower()
+	if re.search(r"^<[a-z0-9 =\"]+/>$", line):
 		if re.search(r"^<note [a-z0-9 =\"]+/>$", line):
 			note = Note()
 			letterMatch = re.search(r"^.+ letter=\"([a-z])\"", line)
@@ -80,9 +79,9 @@ while not done:
 			chstep = ChStep()
 			music.add(chstep)
 		else:
-			lineError = True
+			raise LineError("No supported tag found at line '%s'" % origLine)
 	elif line == "done":
 		done = True
 		music.display()
-	elif lineError:
-		print("lineError")
+	else:
+		raise LineError("Malformed input at line '%s'" % origLine)
