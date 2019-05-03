@@ -7,22 +7,16 @@ import math
 import numpy as np
 
 #sine_tone() from here: https://stackoverflow.com/questions/8299303/generating-sine-wave-sound-in-python
-def sine_tone(f, duration, p, volume=0.5, fs=44100):
+def sine_tone(f, duration, stream):
 
 	# generate samples, note conversion to float32 array
-	samples = (np.sin(2*np.pi*np.arange(fs*duration)*f/fs)).astype(np.float32).tobytes()
-
-	# for paFloat32 sample values must be in range [-1.0, 1.0]
-	stream = p.open(format=pyaudio.paFloat32,
-	                channels=1,
-	                rate=fs,
-	                output=True)
+	samples = (np.sin(2*np.pi*np.arange(44100*duration)*f/44100)).astype(np.float32).tobytes()
 
 	# play. May repeat with different volume values (if done interactively) 
 	stream.write(samples)
 
-	stream.stop_stream()
-	stream.close()
+	stream.write(b"0x80"*100)
+
 
 class Note:
 	def __init__(self, letter="c", mod="", octave=5, duration=1):

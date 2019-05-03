@@ -1,5 +1,6 @@
 import re
 from objects import Note, ChNote, Rest, ChRest, Properties, ChStep, LineError
+import pyaudio
 from pyaudio import PyAudio
 import os
 import threading
@@ -144,14 +145,17 @@ def playList(content, p):
 			obj.rest(a, tempo, e)
 
 def mainMenu(p):
+	stream = p.open(format=pyaudio.paFloat32, channels=1, rate=44100, output=True)
 	done = False
 	while not done:
 		filename = input("Enter path to file:\n")
 		if os.path.isfile(filename):
-			playList(readToList(open(filename,"r")), p)
+			playList(readToList(open(filename,"r")), stream)
 			done = True
 		else:
 			print("File '%s' does not exist." % filename)
+	stream.stop_stream()
+	stream.close()
 	p.terminate()
 
 mainMenu(p)
