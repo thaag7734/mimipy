@@ -1,5 +1,5 @@
 import re
-from objects import *
+from objects import Note, ChNote, Rest, ChRest, Properties, ChStep
 
 FILTERS = {
 	"line": re.compile(r"^<[a-z0-9 =\"]+/>$"),
