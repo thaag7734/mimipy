@@ -37,7 +37,8 @@ class Note:
 		if keyMod == "":
 			keyMod = KEYS[key][self.letter]
 		n = SEMITONES[self.letter + keyMod]
-		hz = a*2**((n-9)/12)
+		octaveDiff = self.octave - 4
+		hz = a*2**(((n+octaveDiff*12)-9)/12)
 		sine_tone(hz, 60/tempo*self.duration)
 		time.sleep(60/tempo*self.duration)
 		
@@ -53,7 +54,8 @@ class ChNote:
 		if keyMod == "":
 			keyMod = KEYS[key][self.letter]
 		n = SEMITONES[self.letter + keyMod]
-		hz = a*2**((n-9)/12)
+		octaveDiff = self.octave - 4
+		hz = a*2**(((n+octaveDiff*12)-9)/12)
 		sine_tone(hz, 60/tempo*self.duration)
 
 class Rest:
