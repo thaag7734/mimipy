@@ -1,6 +1,7 @@
 import re
 from objects import Note, ChNote, Rest, ChRest, Properties, ChStep
 import os
+import threading
 
 chrestEvent = threading.Event()
 
