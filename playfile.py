@@ -19,8 +19,7 @@ FILTERS = {
 	"prop": re.compile(r"^<prop [a-z0-9 =\"]+/>$"),
 	"chstep": re.compile(r"<chstep(?: )?/>"),
 	
-	"letter": re.compile(r"^.+ letter=\"([a-z])\""),
-	"mod": re.compile(r"^.+ mod=\"([sfn])\""),
+	"letter": re.compile(r"^.+ letter=\"([a-g](?:[sfn])?)\""),
 	"octave": re.compile(r"^.+ octave=(\d)"),
 	"duration": re.compile(r"^.+ duration=((?:\d+)\.\d+|\d+)"),
 	"tempo": re.compile(r"^.+ tempo=(\d+)"),
@@ -44,13 +43,12 @@ def getLineObject(line, origLine):
 		if FILTERS["note"].search(line):
 			note = Note()
 			letterMatch = FILTERS["letter"].search(line)
-			modMatch = FILTERS["mod"].search(line)
 			octaveMatch = FILTERS["octave"].search(line)
 			durationMatch = FILTERS["duration"].search(line)
 			if letterMatch:
-				note.letter = letterMatch[1]
-			if modMatch:
-				note.mod = modMatch[1]
+				if len(letterMatch[1]) > 1:
+					note.mod = letterMatch[1][1]
+				note.letter = letterMatch[1][0]
 			if octaveMatch:
 				note.octave = int(octaveMatch[1])
 			if durationMatch:
@@ -59,13 +57,12 @@ def getLineObject(line, origLine):
 		elif FILTERS["chnote"].search(line):
 			chnote = ChNote()
 			letterMatch = FILTERS["letter"].search(line)
-			modMatch = FILTERS["mod"].search(line)
 			octaveMatch = FILTERS["octave"].search(line)
 			durationMatch = FILTERS["duration"].search(line)
 			if letterMatch:
-				chnote.letter = letterMatch[1]
-			if modMatch:
-				chnote.mod = modMatch[1]
+				if len(letterMatch[1]) > 1:
+					chnote.mod = letterMatch[1][1]
+				chnote.letter = letterMatch[1][0]
 			if octaveMatch:
 				chnote.octave = int(octaveMatch[1])
 			if durationMatch:
