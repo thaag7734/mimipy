@@ -1,7 +1,10 @@
 import re
-from objects import Note, ChNote, Rest, ChRest, Properties, ChStep
+from objects import Note, ChNote, Rest, ChRest, Properties, ChStep, LineError
+from pyaudio import PyAudio
 import os
 import threading
+
+p = PyAudio()
 
 chrestEvent = threading.Event()
 
@@ -19,7 +22,7 @@ FILTERS = {
 	"mod": re.compile(r"^.+ mod=\"([sfn])\""),
 	"octave": re.compile(r"^.+ octave=(\d)"),
 	"duration": re.compile(r"^.+ duration=((?:\d)\.\d+|\d)"),
-	"tempo": re.compile(r"^.+ tempo=(\d)"),
+	"tempo": re.compile(r"^.+ tempo=(\d+)"),
 	"key": re.compile(r"^.+ key=\"([a-g](?:[sfn])?)\""),
 	"tstop": re.compile(r"^.+ tstop=(\d)"),
 	"tsbtm": re.compile(r"^.+ tsbtm=(\d)"),
@@ -30,14 +33,14 @@ FILTERS = {
 def readToList(f):
 	fileContent = []
 	for line in f:
-		if not (FILTERS["comment"].fullmatch(line.rstrip("\n")) or line.rstrip("\n") == ""):
+		if not (FILTERS["comment"].search(line.rstrip("\n")) or line.rstrip("\n") == ""):
 			fileContent.append(line)
 	f.close()
 	return fileContent
 
 def getLineObject(line, origLine):
-	if FILTERS["line"].fullmatch(line):
-		if FILTERS["note"].fullmatch(line):
+	if FILTERS["line"].search(line):
+		if FILTERS["note"].search(line):
 			note = Note()
 			letterMatch = FILTERS["letter"].search(line)
 			modMatch = FILTERS["mod"].search(line)
@@ -48,11 +51,11 @@ def getLineObject(line, origLine):
 			if modMatch:
 				note.mod = modMatch[1]
 			if octaveMatch:
-				note.octave = octaveMatch[1]
+				note.octave = int(octaveMatch[1])
 			if durationMatch:
-				note.duration = durationMatch[1]
+				note.duration = float(durationMatch[1])
 			return note
-		elif FILTERS["chnote"].fullmatch(line):
+		elif FILTERS["chnote"].search(line):
 			chnote = ChNote()
 			letterMatch = FILTERS["letter"].search(line)
 			modMatch = FILTERS["mod"].search(line)
@@ -63,29 +66,29 @@ def getLineObject(line, origLine):
 			if modMatch:
 				chnote.mod = modMatch[1]
 			if octaveMatch:
-				chnote.octave = octaveMatch[1]
+				chnote.octave = int(octaveMatch[1])
 			if durationMatch:
-				chnote.duration = durationMatch[1]
+				chnote.duration = float(durationMatch[1])
 			return chnote
-		elif FILTERS["rest"].fullmatch(line):
+		elif FILTERS["rest"].search(line):
 			rest = Rest()
 			letterMatch = FILTERS["letter"].search(line)
 			durationMatch = FILTERS["duration"].search(line)
 			if letterMatch:
 				rest.letter = letterMatch[1]
 			if durationMatch:
-				rest.duration = durationMatch[1]
+				rest.duration = float(durationMatch[1])
 			return rest
-		elif FILTERS["chrest"].fullmatch(line):
+		elif FILTERS["chrest"].search(line):
 			chrest = ChRest()
 			letterMatch = FILTERS["letter"].search(line)
 			durationMatch = FILTERS["duration"].search(line)
 			if letterMatch:
 				chrest.letter = letterMatch[1]
 			if durationMatch:
-				chrest.duration = durationMatch[1]
+				chrest.duration = float(durationMatch[1])
 			return chrest
-		elif FILTERS["prop"].fullmatch(line):
+		elif FILTERS["prop"].search(line):
 			prop = Properties()
 			tempoMatch = FILTERS["tempo"].search(line)
 			keyMatch = FILTERS["key"].search(line)
@@ -93,7 +96,7 @@ def getLineObject(line, origLine):
 			tsbtmMatch = FILTERS["tsbtm"].search(line)
 			tuningMatch = FILTERS["tuning"].search(line)
 			if tempoMatch:
-				prop.tempo = tempoMatch[1]
+				prop.tempo = int(tempoMatch[1])
 			if keyMatch:
 				prop.key = keyMatch[1]
 			if keyMatch:
@@ -102,52 +105,53 @@ def getLineObject(line, origLine):
 				else:
 					prop.key = keyMatch[1]
 			if tstopMatch:
-				prop.tstop = tstopMatch[1]
+				prop.timesig = (int(tstopMatch[1]), prop.timesig[1])
 			if tsbtmMatch:
-				prop.tsbtm = tsbtmMatch[1]
+				prop.timesig = (prop.timesig[0], int(tsbtmMatch[1]))
 			if tuningMatch:
-				prop.a = tuningMatch[1]
+				prop.a = float(tuningMatch[1])
 			return prop
-		elif FILTERS["chstep"].fullmatch(line):
+		elif FILTERS["chstep"].search(line):
 			chstep = ChStep()
 			return chstep
 		else:
 			raise LineError("No supported tag found at line '%s'" % origLine)
-	elif not FILTERS["comment"].fullmatch(line):
+	elif not FILTERS["comment"].search(line):
 		if line != "":
 			raise LineError("Malformed input at line '%s'" % origLine)
 				
-def playList(content):
+def playList(content, p):
 	global chrestEvent
 	tempo = 0
 	key = None
 	timesig = (None, None)
 	chQueue = []
 	for line in content:
-		obj = getObject(line.lower(), line)
+		obj = getLineObject(line.lower(), line)
 		if type(obj) == Properties:
 			tempo = obj.tempo
 			key = obj.key
 			timesig = obj.timesig
 			a = obj.a
 		elif type(obj) == Note:
-			obj.play(a, tempo, key)
+			obj.play(a, tempo, key, p)
 		elif type(obj) == ChNote:
 			if not chrestEvent.isSet():
-				obj.play(a, tempo, key)
+				obj.play(a, tempo, key, p)
 		elif type(obj) == Rest:
 			obj.rest(a, tempo)
 		elif type(obj) == ChRest:
 			obj.rest(a, tempo, e)
 
-def mainMenu():
+def mainMenu(p):
 	done = False
 	while not done:
 		filename = input("Enter path to file:\n")
 		if os.path.isfile(filename):
-			playList(readToList(filename))
+			playList(readToList(open(filename,"r")), p)
 			done = True
 		else:
 			print("File '%s' does not exist." % filename)
+	p.terminate()
 
 mainMenu()

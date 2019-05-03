@@ -1,29 +1,28 @@
+import pyaudio
 from pyaudio import PyAudio
 from musicutils import *
 import time
 import threading
 import math
+import numpy as np
 
-#sine_tone() from here: https://stackoverflow.com/a/974291
-def sine_tone(frequency, duration, volume=1, sample_rate=22050):
-	n_samples = int(sample_rate * duration)
-	restframes = n_samples % sample_rate
-	
-	stream = p.open(format=p.get_format_from_width(1), # 8bit
-		channels=1, # mono
-		rate=sample_rate,
-		output=True)
-	s = lambda t: volume * math.sin(2 * math.pi * frequency * t / sample_rate)
-	samples = (int(s(t) * 0x7f + 0x80) for t in range(n_samples))
-	for buf in zip(*[samples]*sample_rate): # write several samples at a time
-		stream.write(bytes(bytearray(buf)))
+#sine_tone() from here: https://stackoverflow.com/questions/8299303/generating-sine-wave-sound-in-python
+def sine_tone(f, duration, p, volume=0.5, fs=44100):
 
-	# fill remainder of frameset with silence
-	stream.write(b'\x80' * restframes)
+	# generate samples, note conversion to float32 array
+	samples = (np.sin(2*np.pi*np.arange(fs*duration)*f/fs)).astype(np.float32).tobytes()
+
+	# for paFloat32 sample values must be in range [-1.0, 1.0]
+	stream = p.open(format=pyaudio.paFloat32,
+	                channels=1,
+	                rate=fs,
+	                output=True)
+
+	# play. May repeat with different volume values (if done interactively) 
+	stream.write(samples)
 
 	stream.stop_stream()
 	stream.close()
-	p.terminate()
 
 class Note:
 	def __init__(self, letter="c", mod="", octave=5, duration=1):
@@ -32,15 +31,14 @@ class Note:
 		self.octave = int(octave)
 		self.duration = float(duration)
 	
-	def play(self, a, tempo, key):
+	def play(self, a, tempo, key, p):
 		keyMod = self.mod
 		if keyMod == "":
 			keyMod = KEYS[key][self.letter]
 		n = SEMITONES[self.letter + keyMod]
 		octaveDiff = self.octave - 4
 		hz = a*2**(((n+octaveDiff*12)-9)/12)
-		sine_tone(hz, 60/tempo*self.duration)
-		time.sleep(60/tempo*self.duration)
+		sine_tone(hz, 60/tempo*self.duration, p)
 		
 class ChNote:
 	def __init__(self, letter="c", mod="", octave=5, duration=1):
@@ -49,14 +47,14 @@ class ChNote:
 		self.octave = int(octave)
 		self.duration = float(duration)
 	
-	def play(self, a, tempo, key):
+	def play(self, a, tempo, key, p):
 		keyMod = self.mod
 		if keyMod == "":
 			keyMod = KEYS[key][self.letter]
 		n = SEMITONES[self.letter + keyMod]
 		octaveDiff = self.octave - 4
 		hz = a*2**(((n+octaveDiff*12)-9)/12)
-		sine_tone(hz, 60/tempo*self.duration)
+		sine_tone(hz, 60/tempo*self.duration, p)
 
 class Rest:
 	def __init__(self, letter="b", duration=1):

@@ -1,0 +1,21 @@
+<!-- Twinkle Twinkle Little Star -->
+
+<prop key="c" tempo=120 tstop=4 tsbtm=4 />
+
+<note letter="c" octave=4 duration=1 />
+<note letter="c" octave=4 duration=1 />
+<note letter="g" octave=4 duration=1 />
+<note letter="g" octave=4 duration=1 />
+
+<note letter="a" octave=4 duration=1 />
+<note letter="a" octave=4 duration=1 />
+<note letter="g" octave=4 duration=2 />
+
+<note letter="f" octave=4 duration=1 />
+<note letter="f" octave=4 duration=1 />
+<note letter="e" octave=4 duration=1 />
+<note letter="e" octave=4 duration=1 />
+
+<note letter="d" octave=4 duration=1 />
+<note letter="d" octave=4 duration=1 />
+<note letter="c" octave=4 duration=2 />
