@@ -92,7 +92,8 @@ def getLineObject(line, origLine):
 		else:
 			raise LineError("No supported tag found at line '%s'" % origLine)
 	else:
-		raise LineError("Malformed input at line '%s'" % origLine)
+		if line != "":
+			raise LineError("Malformed input at line '%s'" % origLine)
 				
 def playList(content):
 	tempo = 0
