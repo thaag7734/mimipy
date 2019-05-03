@@ -1,8 +1,29 @@
-import audiere
+from pyaudio import PyAudio
+from musicutils import *
 import time
 import threading
+import math
 
-AUD_DEV = audiere.open_device()
+#sine_tone() from here: https://stackoverflow.com/a/974291
+def sine_tone(frequency, duration, volume=1, sample_rate=22050):
+	n_samples = int(sample_rate * duration)
+	restframes = n_samples % sample_rate
+	
+	stream = p.open(format=p.get_format_from_width(1), # 8bit
+		channels=1, # mono
+		rate=sample_rate,
+		output=True)
+	s = lambda t: volume * math.sin(2 * math.pi * frequency * t / sample_rate)
+	samples = (int(s(t) * 0x7f + 0x80) for t in range(n_samples))
+	for buf in zip(*[samples]*sample_rate): # write several samples at a time
+		stream.write(bytes(bytearray(buf)))
+
+	# fill remainder of frameset with silence
+	stream.write(b'\x80' * restframes)
+
+	stream.stop_stream()
+	stream.close()
+	p.terminate()
 
 class Note:
 	def __init__(self, letter="c", mod="", octave=5, duration=1):
@@ -17,13 +38,8 @@ class Note:
 			keyMod = KEYS[key][self.letter]
 		n = SEMITONES[self.letter + keyMod]
 		hz = a*2**((n-9)/12)
-		self.t = AUD_DEV.create_tone(hz)
-		self.t.play()
+		sine_tone(hz, 60/tempo*self.duration)
 		time.sleep(60/tempo*self.duration)
-		self.stop()
-	
-	def stop(self):
-		self.t.stop()
 		
 class ChNote:
 	def __init__(self, letter="c", mod="", octave=5, duration=1):
@@ -38,14 +54,7 @@ class ChNote:
 			keyMod = KEYS[key][self.letter]
 		n = SEMITONES[self.letter + keyMod]
 		hz = a*2**((n-9)/12)
-		self.t = AUD_DEV.create_tone(hz)
-		self.t.play()
-		stopThread = threading.Thread(target=self.stop, args=(tempo))
-		stopThread.run()
-	
-	def stop(self, tempo):
-		time.sleep(60/tempo*self.duration)
-		self.stop()
+		sine_tone(hz, 60/tempo*self.duration)
 
 class Rest:
 	def __init__(self, letter="b", duration=1):
