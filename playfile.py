@@ -26,7 +26,7 @@ FILTERS = {
 	"key": re.compile(r"^.+ key=\"([a-g](?:[sfn])?)\""),
 	"tstop": re.compile(r"^.+ tstop=(\d)"),
 	"tsbtm": re.compile(r"^.+ tsbtm=(\d)"),
-	"tuning": re.compile(r"^.+ a=((?:\d)\.\d+|\d)")
+	"tuning": re.compile(r"^.+ a=((?:\d)\.\d+|\d+)")
 	
 }
 
