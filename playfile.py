@@ -11,7 +11,18 @@ FILTERS = {
 	"rest": re.compile(r"^<rest [a-z0-9 =\"]+/>$"),
 	"chrest": re.compile(r"^<chrest [a-z0-9 =\"]+/>$"),
 	"prop": re.compile(r"^<prop [a-z0-9 =\"]+/>$"),
-	"chstep": re.compile(r"<chstep(?: )?/>")
+	"chstep": re.compile(r"<chstep(?: )?/>"),
+	
+	"letter": re.compile(r"^.+ letter=\"([a-z])\""),
+	"mod": re.compile(r"^.+ mod=\"([sfn])\""),
+	"octave": re.compile(r"^.+ octave=(\d)"),
+	"duration": re.compile(r"^.+ duration=((?:\d)\.\d+|\d)"),
+	"tempo": re.compile(r"^.+ tempo=(\d)"),
+	"key": re.compile(r"^.+ key=\"([a-g](?:[sfn])?)\""),
+	"tstop": re.compile(r"^.+ tstop=(\d)"),
+	"tsbtm": re.compile(r"^.+ tsbtm=(\d)"),
+	"tuning": re.compile(r"^.+ a=((?:\d)\.\d+|\d)"),
+	
 }
 
 def readToList(f):
@@ -26,10 +37,10 @@ def getLineObject(line, origLine):
 	if FILTERS["line"].fullmatch(line):
 		if FILTERS["note"].fullmatch(line):
 			note = Note()
-			letterMatch = re.search(r"^.+ letter=\"([a-z])\"", line)
-			modMatch = re.search(r"^.+ mod=\"([sfn])\"", line)
-			octaveMatch = re.search(r"^.+ octave=(\d)", line)
-			durationMatch = re.search(r"^.+ duration=((?:\d)\.\d+|\d)", line)
+			letterMatch = FILTERS["letter"].search(line)
+			modMatch = FILTERS["mod"].search(line)
+			octaveMatch = FILTERS["octave"].search(line)
+			durationMatch = FILTERS["duration"].search(line)
 			if letterMatch:
 				note.letter = letterMatch[1]
 			if modMatch:
@@ -41,10 +52,10 @@ def getLineObject(line, origLine):
 			return note
 		elif FILTERS["chnote"].fullmatch(line):
 			chnote = ChNote()
-			letterMatch = re.search(r"^.+ letter=\"([a-z])\"", line)
-			modMatch = re.search(r"^.+ mod=\"([sfn])\"", line)
-			octaveMatch = re.search(r"^.+ octave=(\d)", line)
-			durationMatch = re.search(r"^.+ duration=((?:\d)\.\d+|\d)", line)
+			letterMatch = FILTERS["letter"].search(line)
+			modMatch = FILTERS["mod"].search(line)
+			octaveMatch = FILTERS["octave"].search(line)
+			durationMatch = FILTERS["duration"].search(line)
 			if letterMatch:
 				chnote.letter = letterMatch[1]
 			if modMatch:
@@ -56,8 +67,8 @@ def getLineObject(line, origLine):
 			return chnote
 		elif FILTERS["rest"].fullmatch(line):
 			rest = Rest()
-			letterMatch = re.search(r"^.+ letter=\"([a-z])\"", line)
-			durationMatch = re.search(r"^.+ duration=((?:\d)\.\d+|\d)", line)
+			letterMatch = FILTERS["letter"].search(line)
+			durationMatch = FILTERS["duration"].search(line)
 			if letterMatch:
 				rest.letter = letterMatch[1]
 			if durationMatch:
@@ -65,8 +76,8 @@ def getLineObject(line, origLine):
 			return rest
 		elif FILTERS["chrest"].fullmatch(line):
 			chrest = ChRest()
-			letterMatch = re.search(r"^.+ letter=\"([a-z])\"", line)
-			durationMatch = re.search(r"^.+ duration=((?:\d)\.\d+|\d)", line)
+			letterMatch = FILTERS["letter"].search(line)
+			durationMatch = FILTERS["duration"].search(line)
 			if letterMatch:
 				chrest.letter = letterMatch[1]
 			if durationMatch:
@@ -74,10 +85,11 @@ def getLineObject(line, origLine):
 			return chrest
 		elif FILTERS["prop"].fullmatch(line):
 			prop = Properties()
-			tempoMatch = re.search(r"^.+ tempo=(\d)", line)
-			keyMatch = re.search(r"^.+ key=\"([a-g](?:[sfn])?)\"", line)
-			tstopMatch = re.search(r"^.+ tstop=(\d)", line)
-			tsbtmMatch = re.search(r"^.+ tsbtm=(\d)", line)
+			tempoMatch = FILTERS["tempo"].search(line)
+			keyMatch = FILTERS["key"].search(line)
+			tstopMatch = FILTERS["tstop"].search(line)
+			tsbtmMatch = FILTERS["tsbtm"].search(line)
+			tuningMatch = FILTERS["tuning"].search(line)
 			if tempoMatch:
 				prop.tempo = tempoMatch[1]
 			if keyMatch:
@@ -91,6 +103,8 @@ def getLineObject(line, origLine):
 				prop.tstop = tstopMatch[1]
 			if tsbtmMatch:
 				prop.tsbtm = tsbtmMatch[1]
+			if tuningMatch:
+				prop.a = tuningMatch[1]
 			return prop
 		elif FILTERS["chstep"].fullmatch(line):
 			chstep = ChStep()
