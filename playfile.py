@@ -108,5 +108,5 @@ def playList(content):
 			timesig = obj.timesig
 			a = obj.a
 		elif type(obj) == Note:
-			obj.play(a, tempo)
+			obj.play(a, tempo, key)
 			
