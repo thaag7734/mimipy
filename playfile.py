@@ -1,5 +1,6 @@
 import re
 from objects import Note, ChNote, Rest, ChRest, Properties, ChStep
+import os
 
 chrestEvent = threading.Event()
 
@@ -137,3 +138,15 @@ def playList(content):
 			obj.rest(a, tempo)
 		elif type(obj) == ChRest:
 			obj.rest(a, tempo, e)
+
+def mainMenu():
+	done = False
+	while not done:
+		filename = input("Enter path to file:\n")
+		if os.path.isfile(filename):
+			playList(readToList(filename))
+			done = True
+		else:
+			print("File '%s' does not exist." % filename)
+
+mainMenu()
