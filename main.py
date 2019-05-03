@@ -5,7 +5,6 @@ done = False
 music = Music()
 
 while not done:
-	lineError = False
 	origLine = input("Enter line:\n")
 	line = origLine.lower()
 	if re.search(r"^<[a-z0-9 =\"]+/>$", line):
