@@ -13,12 +13,13 @@ Python parser for [MIMI](https://github.com/thaag7734/mimi)
 3. Run `python3 -m pip install -r requirements.txt` from the terminal in your MIMIPy folder.
 4. Run `playfile.py`.
 #### Mac users:
-1. Install Xcode from the app store, then run these 4 commands in sequence from the terminal:
+1. Install Homebrew if you haven't already by running `/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"` from the terminal.
+2. Install Xcode from the app store, then run these 4 commands in sequence from the terminal:
 ```
 xcode-select --install
 brew remove portaudio
 brew install portaudio
 pip3 install pyaudio
 ```
-2. Run `pip3 install -r requirements.txt` from the terminal in your MIMIPy folder.
-3. Run `playfile.py`.
+3. Run `pip3 install -r requirements.txt` from the terminal in your MIMIPy folder.
+4. Run `playfile.py`.
