@@ -29,10 +29,11 @@ class ChStep:
 		pass
 
 class Properties:
-	def __init__(self, tempo=80, key="c", tstop=4, tsbtm=4):
+	def __init__(self, tempo=80, key="c", tstop=4, tsbtm=4, a=440):
 		self.tempo = int(tempo)
 		self.key = key
 		self.timesig = (int(tstop),int(tsbtm))
+		self.a = int(a)
 
 class Music:
 	def __init__(self, prop=Properties()):
