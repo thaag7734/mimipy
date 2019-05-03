@@ -1,5 +1,3 @@
-
-
 class Note:
 	def __init__(self, letter="c", mod="", octave=5, duration=1):
 		self.letter = letter
@@ -58,3 +56,6 @@ class Music:
 				print("Prop: %sbpm;%s;%s/%s" % (str(item.tempo), item.key, str(item.timesig[0]), str(item.timesig[1])))
 			elif type(item) is ChStep:
 				print("ChStep")
+
+class LineError(Exception):
+	pass
