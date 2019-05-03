@@ -51,11 +51,22 @@ class Rest:
 	def __init__(self, letter="b", duration=1):
 		self.letter = letter
 		self.duration = float(duration)
+	
+	def rest(self, tempo):
+		time.sleep(60/tempo*self.duration)
 		
 class ChRest:
 	def __init__(self, letter="f", duration=1):
 		self.letter = letter
 		self.duration = float(duration)
+	
+	def rest(self, tempo, e):
+		restThread = threading.Thread(target=self.chrest, args=(tempo, e))
+		
+	def chrest(self, tempo, e):
+		e.set()
+		time.sleep(60/tempo*self.duration)
+		e.clear()
 		
 class ChStep:
 	def __init__(self):
