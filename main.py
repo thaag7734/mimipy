@@ -19,10 +19,7 @@ while not done:
 			if letterMatch:
 				note.letter = letterMatch[1]
 			if modMatch:
-				if modMatch[1] == "n":
-					note.mod = ""
-				else:
-					note.mod = modMatch[1]
+				note.mod = modMatch[1]
 			if octaveMatch:
 				note.octave = octaveMatch[1]
 			if durationMatch:
@@ -37,10 +34,7 @@ while not done:
 			if letterMatch:
 				chnote.letter = letterMatch[1]
 			if modMatch:
-				if modMatch[1] == "n":
-					chnote.mod = ""
-				else:
-					chnote.mod = modMatch[1]
+				chnote.mod = modMatch[1]
 			if octaveMatch:
 				chnote.octave = octaveMatch[1]
 			if durationMatch:
