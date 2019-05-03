@@ -4,6 +4,7 @@ from objects import Note, ChNote, Rest, ChRest, Properties, ChStep
 chrestEvent = threading.Event()
 
 FILTERS = {
+	"comment": re.compile(r"^<!--.+-->$"),
 	"line": re.compile(r"^<[a-z0-9 =\"]+/>$"),
 	"note": re.compile(r"^<note [a-z0-9 =\"]+/>$"),
 	"chnote": re.compile(r"^<chnote [a-z0-9 =\"]+/>$"),
@@ -14,7 +15,10 @@ FILTERS = {
 }
 
 def readToList(f):
-	fileContent = [line.rstrip("\n") for line in f]
+	fileContent = []
+	for line in f:
+		if not (FILTERS["comment"].fullmatch(line.rstrip("\n")) or line.rstrip("\n") == ""):
+			fileContent.append(line)
 	f.close()
 	return fileContent
 
@@ -93,7 +97,7 @@ def getLineObject(line, origLine):
 			return chstep
 		else:
 			raise LineError("No supported tag found at line '%s'" % origLine)
-	else:
+	elif not FILTERS["comment"].fullmatch(line):
 		if line != "":
 			raise LineError("Malformed input at line '%s'" % origLine)
 				
@@ -102,7 +106,7 @@ def playList(content):
 	tempo = 0
 	key = None
 	timesig = (None, None)
-	chList = []
+	chQueue = []
 	for line in content:
 		obj = getObject(line.lower(), line)
 		if type(obj) == Properties:
@@ -113,8 +117,8 @@ def playList(content):
 		elif type(obj) == Note:
 			obj.play(a, tempo, key)
 		elif type(obj) == ChNote:
-			if not chrestEvent.isSet()
-			obj.play(a, tempo, key)
+			if not chrestEvent.isSet():
+				obj.play(a, tempo, key)
 		elif type(obj) == Rest:
 			obj.rest(a, tempo)
 		elif type(obj) == ChRest:
