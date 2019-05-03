@@ -13,7 +13,7 @@ Python parser for [MIMI](https://github.com/thaag7734/mimi)
 3. Run `python3 -m pip install -r requirements.txt` from the terminal in your MIMIPy folder.
 4. Run `playfile.py`.
 #### Mac users:
-1. Install XCode from the app store, then run these 4 commands in sequence from the terminal:
+1. Install Xcode from the app store, then run these 4 commands in sequence from the terminal:
 ```
 xcode-select --install
 brew remove portaudio
