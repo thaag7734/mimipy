@@ -1,9 +1,48 @@
+import audiere
+import time
+import threading
+
+AUD_DEV = audiere.open_device()
+
+SEMITONES = {
+	"cs": 1,
+	"df": 1,
+	"dn": 2,
+	"ds": 3,
+	"ef": 3,
+	"en": 4,
+	"es": 5,
+	"fn": 5,
+	"fs": 6,
+	"gf": 6,
+	"gn": 7,
+	"gs": 8,
+	"af": 8,
+	"an": 9,
+	"as": 10,
+	"bf": 10,
+	"bn": 11,
+	"bs": 12,
+	"cf": 12
+}
+
 class Note:
 	def __init__(self, letter="c", mod="", octave=5, duration=1):
 		self.letter = letter
 		self.mod = mod
 		self.octave = int(octave)
 		self.duration = float(duration)
+	
+	def play(self, a, tempo):
+		n = SEMITONES[self.letter + self.mod]
+		hz = a*2**((n-9)/12)
+		self.t = AUD_DEV.create_tone(hz)
+		self.t.play()
+		time.sleep(60/tempo*self.duration)
+		self.stop()
+	
+	def stop(self):
+		self.t.stop()
 		
 class ChNote:
 	def __init__(self, letter="c", mod="", octave=5, duration=1):
@@ -11,6 +50,18 @@ class ChNote:
 		self.mod = mod
 		self.octave = int(octave)
 		self.duration = float(duration)
+	
+	def play(self, a, tempo):
+		n = SEMITONES[self.letter + self.mod]
+		hz = a*2**((n-9)/12)
+		self.t = AUD_DEV.create_tone(hz)
+		self.t.play()
+		stopThread = threading.Thread(target=self.stop, args=(tempo))
+		stopThread.run()
+	
+	def stop(self, tempo):
+		time.sleep(60/tempo*self.duration)
+		self.stop()
 
 class Rest:
 	def __init__(self, letter="b", duration=1):
