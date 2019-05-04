@@ -11,12 +11,12 @@ chrestEvent = threading.Event()
 
 FILTERS = {
 	"comment": re.compile(r"^<!--.+-->$"),
-	"line": re.compile(r"^<[a-z0-9 =\"]+/>$"),
-	"note": re.compile(r"^<note [a-z0-9 =\"]+/>$"),
-	"chnote": re.compile(r"^<chnote [a-z0-9 =\"]+/>$"),
-	"rest": re.compile(r"^<rest [a-z0-9 =\"]+/>$"),
-	"chrest": re.compile(r"^<chrest [a-z0-9 =\"]+/>$"),
-	"prop": re.compile(r"^<prop [a-z0-9 =\"]+/>$"),
+	"line": re.compile(r"^<[a-z0-9 \.=\"]+/>$"),
+	"note": re.compile(r"^<note [a-z0-9 \.=\"]+/>$"),
+	"chnote": re.compile(r"^<chnote [a-z0-9 \.=\"]+/>$"),
+	"rest": re.compile(r"^<rest [a-z0-9 \.=\"]+/>$"),
+	"chrest": re.compile(r"^<chrest [a-z0-9 \.=\"]+/>$"),
+	"prop": re.compile(r"^<prop [a-z0-9 \.=\"]+/>$"),
 	"chstep": re.compile(r"<chstep(?: )?/>"),
 	
 	"letter": re.compile(r"^.+ letter=\"([a-g](?:[sfn])?)\""),
