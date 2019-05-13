@@ -1,21 +1,23 @@
-<!-- Twinkle Twinkle Little Star -->
-
-<prop key="c" tempo=120 tstop=4 tsbtm=4 />
-
-<note letter="c" octave=4 duration=1 />
-<note letter="c" octave=4 duration=1 />
-<note letter="g" octave=4 duration=1 />
-<note letter="g" octave=4 duration=1 />
-
-<note letter="a" octave=4 duration=1 />
-<note letter="a" octave=4 duration=1 />
-<note letter="g" octave=4 duration=2 />
-
-<note letter="f" octave=4 duration=1 />
-<note letter="f" octave=4 duration=1 />
-<note letter="e" octave=4 duration=1 />
-<note letter="e" octave=4 duration=1 />
-
-<note letter="d" octave=4 duration=1 />
-<note letter="d" octave=4 duration=1 />
-<note letter="c" octave=4 duration=2 />
+<mimi version="2.0">
+	<meta>
+		<title>Aaaaaaaa</title>
+		<tempo>120</tempo>
+	</meta>
+	<music>
+		<beat>
+			<note letter="C">
+				<duration>3</duration>
+			</note>
+		</beat>
+		<beat>
+			<note letter="D#">
+				<duration>2</duration>
+			</note>
+		</beat>
+		<beat>
+			<note letter="G">
+				<duration>1</duration>
+			</note>
+		</beat>
+	</music>
+</mimi>
