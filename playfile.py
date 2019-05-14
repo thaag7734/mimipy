@@ -31,6 +31,8 @@ def playMusic(music, meta):
 				n.octave = note.find("octave").text
 			except ParseError:
 				n.octave = 4
+			n.setFrequency()
+			
 
 def mainMenu(p):
 	stream = p.open(format=pyaudio.paFloat32, channels=1, rate=44100, output=True)

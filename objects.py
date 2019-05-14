@@ -19,13 +19,10 @@ def sine_tone(f, duration, stream):
 
 
 class Note:
-	def __init__(self, letter="c", octave=5, duration=1):
+	def __init__(self, letter="c", octave=4, duration=1):
 		self.letter = letter
 		self.octave = int(octave)
 		self.duration = float(duration)
-	
-	def play(self, a, tempo, key, p):
-		sine_tone(hz, 60/tempo*self.duration, p)
 
 	def setFrequency():
 		if not self.letter[1]:
@@ -34,7 +31,7 @@ class Note:
 			letter = self.letter
 		n = SEMITONES[letter]
 		octaveDiff = self.octave - 4
-		hz = a*2**(((n+octaveDiff*12)-9)/12)
+		self.hz = a*2**(((n+octaveDiff*12)-9)/12)
 
 class Rest:
 	def __init__(self, letter="b", duration=1):
