@@ -23,13 +23,29 @@ def playMusic(music, meta):
 	for beat in music.iter("beat"):
 		for note in beat.iter("note"):
 			n = Note()
+			
 			n.letter = note.get("letter")
 			letterMatch = FILTERS["letter"].match(n.letter)
 			if not letterMatch:
 				raise InvalidValueError("Note letter must be from A-G inclusive, with optional # or b modifier/octave number.")
-			n.duration = note.find("duration").text
+
+			duration = note.find("duration").text
+			if FILTERS["float"].match(duration):
+				n.duration = float(duration)
+
+			octaveText = None
+			try:
+				octaveText = note.find("octave").text
+			except ParseError:
+				pass
 			if letterMatch[2]:
-				n.octave = letterMatch[2]
+				n.octave = int(letterMatch[2])
+			elif octaveMatch:
+				if FILTERS["int"].match(octaveText):
+					n.octave = int(note.find("octave").text)
+			else:
+				n.octave = 4
+
 			n.setFrequency()
 
 def mainMenu(p):
