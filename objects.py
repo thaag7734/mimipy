@@ -19,10 +19,8 @@ def sine_tone(f, duration, stream):
 
 
 class Note:
-	def __init__(self, letter="c", octave=4, duration=1):
-		self.letter = letter
+	def __init__(self, octave=4):
 		self.octave = int(octave)
-		self.duration = float(duration)
 
 	def setFrequency():
 		if not self.letter[1]:
@@ -46,6 +44,7 @@ class Meta:
 		self.meta = meta
 		self.title = None
 		self.tempo = None
+		self.tuning = 440
 
 class MIMIError(Exception):
 	pass

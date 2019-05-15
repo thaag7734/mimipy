@@ -14,7 +14,7 @@ chrestEvent = threading.Event()
 FILTERS = {
 	"float": re.compile(r"^(\d+|(?:\d+)?\.\d+)$"),
 	"int": re.compile(r"^(\d+)$"),
-	"letter": re.compile(r"^([A-G](?:[#b])?)$")
+	"letter": re.compile(r"^([A-G](?:[#b])?(\d)?)$")
 	}
 
 
@@ -24,15 +24,13 @@ def playMusic(music, meta):
 		for note in beat.iter("note"):
 			n = Note()
 			n.letter = note.get("letter")
-			if not FILTERS["letter"].match(n.letter):
-				raise InvalidValueError("Note letter must be from A-G inclusive, with optional # or b modifier.")
+			letterMatch = FILTERS["letter"].match(n.letter)
+			if not letterMatch:
+				raise InvalidValueError("Note letter must be from A-G inclusive, with optional # or b modifier/octave number.")
 			n.duration = note.find("duration").text
-			try:
-				n.octave = note.find("octave").text
-			except ParseError:
-				n.octave = 4
+			if letterMatch[2]:
+				n.octave = letterMatch[2]
 			n.setFrequency()
-			
 
 def mainMenu(p):
 	stream = p.open(format=pyaudio.paFloat32, channels=1, rate=44100, output=True)
