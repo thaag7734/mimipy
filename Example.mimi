@@ -16,7 +16,9 @@
 			</note>
 		</beat>
 		<beat>
-			<note letter="G">
+			<note letter="G5">
+				<octave>4</octave>
+				<!-- This note will be a G5, not G4, as octaves specified in the `letter` field have precedence over <octave> tags-->
 				<duration>1</duration>
 			</note>
 		</beat>
