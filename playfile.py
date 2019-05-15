@@ -1,13 +1,13 @@
 import re
 from objects import *
-import pyaudio
-from pyaudio import PyAudio
+#import pyaudio
+#from pyaudio import PyAudio
 import os
 import threading
 import defusedxml.ElementTree as ET
 from defusedxml.ElementTree import ParseError
 
-p = PyAudio()
+#p = PyAudio()
 
 chrestEvent = threading.Event()
 
@@ -26,6 +26,7 @@ def playMusic(music, meta):
 
 			n.letter = note.get("letter")
 			letterMatch = FILTERS["letter"].match(n.letter)
+			letterGroups = letterMatch.groups()
 			if not letterMatch:
 				raise InvalidValueError("Note letter must be from A-G inclusive, with optional # or b modifier/octave number.")
 
@@ -33,8 +34,8 @@ def playMusic(music, meta):
 			if FILTERS["float"].match(duration):
 				n.duration = float(duration)
 
-			if len(letterMatch) == 3:
-				n.octave = int(letterMatch[2])
+			if len(letterGroups) == 3:
+				n.octave = int(letterGroups[2])
 			else:
 				octaveText = None
 				try:
@@ -49,8 +50,8 @@ def playMusic(music, meta):
 
 			n.setFrequency()
 
-def mainMenu(p):
-	stream = p.open(format=pyaudio.paFloat32, channels=1, rate=44100, output=True)
+def mainMenu():
+	#stream = p.open(format=pyaudio.paFloat32, channels=1, rate=44100, output=True)
 	done = False
 	while not done:
 		filename = input("Enter path to file:\n")
@@ -74,8 +75,8 @@ def mainMenu(p):
 			done = True
 		else:
 			print("File '%s' does not exist." % filename)
-	stream.stop_stream()
-	stream.close()
-	p.terminate()
+	#stream.stop_stream()
+	#stream.close()
+	#p.terminate()
 
-mainMenu(p)
+mainMenu()
