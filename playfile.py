@@ -33,7 +33,7 @@ def playMusic(music, meta):
 			if FILTERS["float"].match(duration):
 				n.duration = float(duration)
 
-			if letterMatch[2]:
+			if len(letterMatch) == 3:
 				n.octave = int(letterMatch[2])
 			else:
 				octaveText = None
