@@ -18,16 +18,18 @@ def playMusic(music, meta):
 
 			n.letter = note.get("letter")
 			letterMatch = FILTERS["letter"].match(n.letter)
-			letterGroups = letterMatch.groups()
 			if not letterMatch:
 				raise InvalidValueError("Note letter must be from A-G inclusive, with optional # or b modifier/octave number.")
+			letterGroups = letterMatch.groups()
 
 			duration = note.find("duration")
 			try:
 				if FILTERS["float"].match(duration.text):
 					n.duration = float(duration)
+				else:
+					raise InvalidValueError("Note duration values must be a decimal or integer number.")
 			except AttributeError:
-				...
+				raise MissingElementError("Notes must have a defined duration using the <duration> tag.")
 
 			if len(letterGroups) == 3:
 				n.octave = int(letterGroups[2])
