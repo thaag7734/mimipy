@@ -10,14 +10,6 @@ from defusedxml.ElementTree import ParseError
 #p = PyAudio()
 
 chrestEvent = threading.Event()
-
-FILTERS = {
-	"float": re.compile(r"^(\d+|(?:\d+)?\.\d+)$"),
-	"int": re.compile(r"^(\d+)$"),
-	"letter": re.compile(r"^([A-G](?:[#b])?(\d)?)$")
-	}
-
-
 				
 def playMusic(music, meta):
 	for beat in music.iter("beat"):
@@ -30,9 +22,12 @@ def playMusic(music, meta):
 			if not letterMatch:
 				raise InvalidValueError("Note letter must be from A-G inclusive, with optional # or b modifier/octave number.")
 
-			duration = note.find("duration").text
-			if FILTERS["float"].match(duration):
-				n.duration = float(duration)
+			duration = note.find("duration")
+			try:
+				if FILTERS["float"].match(duration.text):
+					n.duration = float(duration)
+			except AttributeError:
+				...
 
 			if len(letterGroups) == 3:
 				n.octave = int(letterGroups[2])
@@ -40,7 +35,7 @@ def playMusic(music, meta):
 				octaveText = None
 				try:
 					octaveText = note.find("octave").text
-				except ParseError:
+				except AttributeError:
 					pass
 				if octaveText:
 					if FILTERS["int"].match(octaveText):
@@ -48,7 +43,7 @@ def playMusic(music, meta):
 				else:
 					n.octave = 4
 
-			n.setFrequency()
+			n.setFrequency(meta.tuning, meta.key)
 
 def mainMenu():
 	#stream = p.open(format=pyaudio.paFloat32, channels=1, rate=44100, output=True)
@@ -60,12 +55,35 @@ def mainMenu():
 			root = tree.getroot()
 
 			meta = Meta(root.find("meta"))
-			meta.title = meta.meta.find("title").text
-			if not meta.title:
+			title = meta.meta.find("title")
+			try:
+				meta.title = title.text
+			except AttributeError:
 				raise MissingElementError("Title tag is missing from song metadata.")
-			meta.tempo = meta.meta.find("tempo").text
-			if not FILTERS["int"].match(meta.tempo):
-				raise InvalidValueError("Tempo must be an integer.")
+
+			tempo = meta.meta.find("tempo")
+			try:
+				if not FILTERS["int"].match(tempo.text):
+					raise InvalidValueError("Tempo must be an integer.")
+				meta.tempo = tempo.text
+			except AttributeError:
+				raise MissingElementError("Tempo element is missing from song metadata.")
+
+			key = meta.meta.find("key")
+			try:
+				if not FILTERS["keyletter"].match(key.text):
+					raise InvalidValueError("Invalid value supplied for key element.")
+				meta.key = key.text
+			except AttributeError:
+					raise MissingElementError("Key element is missing from song metadata.")
+				
+			tuning = meta.meta.find("tuning")
+			try:
+				if not FILTERS["float"].match(tuning.text):
+					raise InvalidValueError("Tuning value must be a decimal or integer number.")
+				meta.tuning = tuning.text
+			except AttributeError:
+				meta.tuning = 440
 
 			music = root.find("music")
 

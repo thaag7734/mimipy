@@ -5,6 +5,14 @@ import time
 import threading
 import math
 import numpy as np
+import re
+
+FILTERS = {
+	"float": re.compile(r"^(\d+|(?:\d+)?\.\d+)$"),
+	"int": re.compile(r"^(\d+)$"),
+	"letter": re.compile(r"^([A-G](?:[#b])?(\d)?)$"),
+	"keyletter": re.compile(r"^([A-G](?:[#b])?)$")
+	}
 
 #sine_tone() from here: https://stackoverflow.com/questions/8299303/generating-sine-wave-sound-in-python
 def sine_tone(f, duration, stream):
@@ -22,11 +30,12 @@ class Note:
 	def __init__(self, octave=4):
 		self.octave = int(octave)
 
-	def setFrequency():
-		if not self.letter[1]:
-			letter = KEYS[key][self.letter]
-		else:
-			letter = self.letter
+	def setFrequency(self, a, key):
+		letterGroups = FILTERS["letter"].match(self.letter).groups()
+		letter = self.letter
+		if len(letterGroups) == 3:
+			mod = KEYS[key][self.letter[:-1]]
+			letter = self.letter + self.mod
 		n = SEMITONES[letter]
 		octaveDiff = self.octave - 4
 		self.hz = a*2**(((n+octaveDiff*12)-9)/12)
