@@ -1,8 +1,8 @@
 import re
 from objects import *
-#import pyaudio
-#from pyaudio import PyAudio
+from audiolazy import AudioIO
 import os
+import numpy as np
 import threading
 import defusedxml.ElementTree as ET
 from defusedxml.ElementTree import ParseError
@@ -12,40 +12,50 @@ from defusedxml.ElementTree import ParseError
 chrestEvent = threading.Event()
 				
 def playMusic(music, meta):
-	for beat in music.iter("beat"):
-		for note in beat.iter("note"):
-			n = Note()
+	with AudioIO(True) as player:
+		for beat in music.iter("beat"):
+			for note in beat.iter("note"):
+				n = Note()
 
-			n.letter = note.get("letter")
-			letterMatch = FILTERS["letter"].match(n.letter)
-			if not letterMatch:
-				raise InvalidValueError("Note letter must be from A-G inclusive, with optional # or b modifier/octave number.")
-			letterGroups = letterMatch.groups()
+				n.letter = note.get("letter")
+				letterMatch = FILTERS["letter"].match(n.letter)
+				if not letterMatch:
+					raise InvalidValueError("Note letter must be from A-G inclusive, with optional # or b modifier/octave number.")
+				letterGroups = letterMatch.groups()
 
-			duration = note.find("duration")
-			try:
-				if FILTERS["float"].match(duration.text):
-					n.duration = float(duration)
-				else:
-					raise InvalidValueError("Note duration values must be a decimal or integer number.")
-			except AttributeError:
-				raise MissingElementError("Notes must have a defined duration using the <duration> tag.")
-
-			if len(letterGroups) == 3:
-				n.octave = int(letterGroups[2])
-			else:
-				octaveText = None
+				duration = note.find("duration")
 				try:
-					octaveText = note.find("octave").text
+					if FILTERS["float"].match(duration.text):
+						n.duration = float(duration.text)
+					else:
+						raise InvalidValueError("Note duration values must be a decimal or integer number.")
 				except AttributeError:
-					pass
-				if octaveText:
-					if FILTERS["int"].match(octaveText):
-						n.octave = int(note.find("octave").text)
-				else:
-					n.octave = 4
+					raise MissingElementError("Notes must have a defined duration using the <duration> tag.")
 
-			n.setFrequency(meta.tuning, meta.key)
+				if len(letterGroups) == 3:
+					n.octave = int(letterGroups[2])
+				else:
+					octaveText = None
+					try:
+						octaveText = note.find("octave").text
+					except AttributeError:
+						pass
+					if octaveText:
+						if FILTERS["int"].match(octaveText):
+							n.octave = int(octaveText)
+					else:
+						n.octave = 4
+
+				n.setFrequency(meta.tuning, meta.key)
+
+				t = threading.Thread(target = player.play, args=(np.sin(2*np.pi*np.arange(44100*duration*60/meta.tempo)*n.hz/44100).astype(np.float32).tobytes(),), kwargs={'rate':44100})
+
+			print("""Note:
+	Letter: %s
+	Duration: %s
+	Octave: %s
+	Frequency: %s
+				""" % (n.letter, str(n.duration), str(n.octave), str(n.hz)))
 
 def mainMenu():
 	#stream = p.open(format=pyaudio.paFloat32, channels=1, rate=44100, output=True)

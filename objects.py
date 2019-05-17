@@ -33,11 +33,12 @@ class Note:
 	def setFrequency(self, a, key):
 		letterGroups = FILTERS["letter"].match(self.letter).groups()
 		letter = self.letter
+		mod = ""
 		if len(letterGroups) == 3:
 			mod = KEYS[key][self.letter[:-1]]
-			letter = self.letter + self.mod
+		letter = "".join(char for char in self.letter if not char.isdigit())
 		n = SEMITONES[letter]
-		octaveDiff = self.octave - 4
+		octaveDiff = self.octave - 3
 		self.hz = a*2**(((n+octaveDiff*12)-9)/12)
 
 class Rest:
