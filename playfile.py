@@ -6,6 +6,9 @@ import numpy as np
 import threading
 import defusedxml.ElementTree as ET
 from defusedxml.ElementTree import ParseError
+import pygame
+
+pygame.mixer.init()
 
 #p = PyAudio()
 
@@ -32,8 +35,8 @@ def playMusic(music, meta):
 				except AttributeError:
 					raise MissingElementError("Notes must have a defined duration using the <duration> tag.")
 
-				if len(letterGroups) == 3:
-					n.octave = int(letterGroups[2])
+				if letterGroups[1]:
+					n.octave = int(letterGroups[1])
 				else:
 					octaveText = None
 					try:
@@ -48,17 +51,24 @@ def playMusic(music, meta):
 
 				n.setFrequency(meta.tuning, meta.key)
 
-				t = threading.Thread(target = player.play, args=(np.sin(2*np.pi*np.arange(44100*duration*60/meta.tempo)*n.hz/44100).astype(np.float32).tobytes(),), kwargs={'rate':44100})
+				sound = pygame.sndarray.make_sound((np.sin(2*np.pi*np.arange(11025*60/n.duration*meta.tempo)*n.hz/11025).astype(np.float32).tobytes()),)
+
+				#t = threading.Thread(target=player.play, args=(samples), kwargs={'rate':11025})
+				t= threading.Thread(target=sound.play, args=())
+				t.run()
+				time.sleep(60/meta.tempo)
 
 			print("""Note:
 	Letter: %s
 	Duration: %s
 	Octave: %s
 	Frequency: %s
-				""" % (n.letter, str(n.duration), str(n.octave), str(n.hz)))
+	Groups: %s
+		%s
+				""" % (n.letter, str(n.duration), str(n.octave), str(n.hz), str(letterGroups), str(letterGroups)))
 
 def mainMenu():
-	#stream = p.open(format=pyaudio.paFloat32, channels=1, rate=44100, output=True)
+	#stream = p.open(format=pyaudio.paFloat32, channels=1, rate=11025, output=True)
 	done = False
 	while not done:
 		filename = input("Enter path to file:\n")
@@ -77,7 +87,8 @@ def mainMenu():
 			try:
 				if not FILTERS["int"].match(tempo.text):
 					raise InvalidValueError("Tempo must be an integer.")
-				meta.tempo = tempo.text
+				meta.tempo = int(tempo.text)
+				print(type(meta.tempo))
 			except AttributeError:
 				raise MissingElementError("Tempo element is missing from song metadata.")
 
@@ -93,7 +104,7 @@ def mainMenu():
 			try:
 				if not FILTERS["float"].match(tuning.text):
 					raise InvalidValueError("Tuning value must be a decimal or integer number.")
-				meta.tuning = tuning.text
+				meta.tuning = float(tuning.text)
 			except AttributeError:
 				meta.tuning = 440
 

@@ -38,7 +38,7 @@ class Note:
 			mod = KEYS[key][self.letter[:-1]]
 		letter = "".join(char for char in self.letter if not char.isdigit())
 		n = SEMITONES[letter]
-		octaveDiff = self.octave - 3
+		octaveDiff = self.octave - 4
 		self.hz = a*2**(((n+octaveDiff*12)-9)/12)
 
 class Rest:
