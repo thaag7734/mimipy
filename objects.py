@@ -14,18 +14,6 @@ FILTERS = {
 	"keyletter": re.compile(r"^([A-G](?:[#b])?)$")
 	}
 
-#sine_tone() from here: https://stackoverflow.com/questions/8299303/generating-sine-wave-sound-in-python
-def sine_tone(f, duration, stream):
-
-	# generate samples, note conversion to float32 array
-	samples = (np.sin(2*np.pi*np.arange(44100*duration)*f/44100)).astype(np.float32).tobytes()
-
-	# play. May repeat with different volume values (if done interactively) 
-	stream.write(samples)
-
-	stream.write(b"0x80"*100)
-
-
 class Note:
 	def __init__(self, octave=4):
 		self.octave = int(octave)
