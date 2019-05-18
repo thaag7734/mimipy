@@ -3,11 +3,13 @@ from objects import *
 from audiolazy import AudioIO
 import os
 import numpy as np
+import math
 import threading
 import defusedxml.ElementTree as ET
 from defusedxml.ElementTree import ParseError
 import pygame
 
+pygame.mixer.pre_init(44100, -16, 1)
 pygame.mixer.init()
 
 #p = PyAudio()
@@ -15,57 +17,72 @@ pygame.mixer.init()
 chrestEvent = threading.Event()
 				
 def playMusic(music, meta):
-	with AudioIO(True) as player:
-		for beat in music.iter("beat"):
-			for note in beat.iter("note"):
-				n = Note()
+	for beat in music.iter("beat"):
+		sounds = []
+		for note in beat.iter("note"):
+			n = Note()
 
-				n.letter = note.get("letter")
-				letterMatch = FILTERS["letter"].match(n.letter)
-				if not letterMatch:
-					raise InvalidValueError("Note letter must be from A-G inclusive, with optional # or b modifier/octave number.")
-				letterGroups = letterMatch.groups()
+			n.letter = note.get("letter")
+			letterMatch = FILTERS["letter"].match(n.letter)
+			if not letterMatch:
+				raise InvalidValueError("Note letter must be from A-G inclusive, with optional # or b modifier/octave number.")
+			letterGroups = letterMatch.groups()
 
-				duration = note.find("duration")
-				try:
-					if FILTERS["float"].match(duration.text):
-						n.duration = float(duration.text)
-					else:
-						raise InvalidValueError("Note duration values must be a decimal or integer number.")
-				except AttributeError:
-					raise MissingElementError("Notes must have a defined duration using the <duration> tag.")
-
-				if letterGroups[1]:
-					n.octave = int(letterGroups[1])
+			duration = note.find("duration")
+			try:
+				if FILTERS["float"].match(duration.text):
+					n.duration = float(duration.text)
 				else:
-					octaveText = None
-					try:
-						octaveText = note.find("octave").text
-					except AttributeError:
-						pass
-					if octaveText:
-						if FILTERS["int"].match(octaveText):
-							n.octave = int(octaveText)
-					else:
-						n.octave = 4
+					raise InvalidValueError("Note duration values must be a decimal or integer number.")
+			except AttributeError:
+				raise MissingElementError("Notes must have a defined duration using the <duration> tag.")
 
-				n.setFrequency(meta.tuning, meta.key)
+			if letterGroups[1]:
+				n.octave = int(letterGroups[1])
+			else:
+				octaveText = None
+				try:
+					octaveText = note.find("octave").text
+				except AttributeError:
+					pass
+				if octaveText:
+					if FILTERS["int"].match(octaveText):
+						n.octave = int(octaveText)
+				else:
+					n.octave = 4
 
-				sound = pygame.sndarray.make_sound((np.sin(2*np.pi*np.arange(11025*60/n.duration*meta.tempo)*n.hz/11025).astype(np.float32).tobytes()),)
+			n.setFrequency(meta.tuning, meta.key)
 
-				#t = threading.Thread(target=player.play, args=(samples), kwargs={'rate':11025})
-				t= threading.Thread(target=sound.play, args=())
-				t.run()
-				time.sleep(60/meta.tempo)
+			#sound = pygame.sndarray.make_sound(np.sin(2*np.pi*np.arange(22050*60/n.duration*meta.tempo)*n.hz/22050))
 
-			print("""Note:
+			n_samples = int(round(n.duration*60/meta.tempo*44100))
+			buf = np.zeros((n_samples), dtype=np.int16)
+			max_sample = 2**(16-1) - 1
+
+			for s in range(n_samples):
+				t = float(s)/44100
+
+				buf[s] = int(round(max_sample*math.sin(2*math.pi*n.hz*t)))
+
+			#t = threading.Thread(target=player.play, args=(samples), kwargs={'rate':11025})
+			sound = pygame.sndarray.make_sound(buf)
+			sound.set_volume(.4)
+			sounds.append(sound)
+
+		for s in sounds:
+			s.play()
+			#t = threading.Thread(target=s.play, args=())
+			#t.run()
+		time.sleep(60/meta.tempo)
+
+		'''print("""Note:
 	Letter: %s
 	Duration: %s
 	Octave: %s
 	Frequency: %s
 	Groups: %s
 		%s
-				""" % (n.letter, str(n.duration), str(n.octave), str(n.hz), str(letterGroups), str(letterGroups)))
+				""" % (n.letter, str(n.duration), str(n.octave), str(n.hz), str(letterGroups), str(letterGroups)))'''
 
 def mainMenu():
 	#stream = p.open(format=pyaudio.paFloat32, channels=1, rate=11025, output=True)

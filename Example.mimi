@@ -6,21 +6,42 @@
 	</meta>
 	<music>
 		<beat>
-			<note letter="C">
-				<duration>3</duration>
-				<octave>4</octave>
+			<note letter="C4">
+				<duration>4</duration>
 			</note>
-		</beat>
-		<beat>
-			<note letter="D#5">
-				<duration>2</duration>
+			<note letter="E4">
+				<duration>4</duration>
 			</note>
-		</beat>
-		<beat>
 			<note letter="G5">
-				<octave>4</octave>
-				<!-- This note will be a G5, not G4, as octaves specified in the `letter` field have precedence over <octave> tags-->
-				<duration>1</duration>
+				<duration>4</duration>
+			</note>
+		</beat>
+		<beat/>
+		<beat/>
+		<beat/>
+		<beat>
+			<note letter="D4">
+				<duration>4</duration>
+			</note>
+			<note letter="F#5">
+				<duration>4</duration>
+			</note>
+			<note letter="A5">
+				<duration>4</duration>
+			</note>
+		</beat>
+		<beat/>
+		<beat/>
+		<beat/>
+		<beat>
+			<note letter="E4">
+				<duration>4</duration>
+			</note>
+			<note letter="G#5">
+				<duration>4</duration>
+			</note>
+			<note letter="B5">
+				<duration>4</duration>
 			</note>
 		</beat>
 	</music>
