@@ -7,7 +7,10 @@ import defusedxml.ElementTree as ET
 from defusedxml.ElementTree import ParseError
 import pygame
 
-pygame.mixer.pre_init(44100, -16, 1)
+BITS = 16
+SAMPLE_RATE = 44100
+
+pygame.mixer.pre_init(SAMPLE_RATE, -BITS, 1)
 pygame.mixer.init()
 				
 def playMusic(music, meta):
@@ -47,12 +50,12 @@ def playMusic(music, meta):
 
 			n.setFrequency(meta.tuning, meta.key)
 
-			n_samples = int(round(n.duration*60/meta.tempo*44100))
+			n_samples = int(round(n.duration*60/meta.tempo*SAMPLE_RATE))
 			buf = np.zeros((n_samples), dtype=np.int16)
-			max_sample = 2**(16-1) - 1
+			max_sample = 2**(BITS-1) - 1
 
 			for s in range(n_samples):
-				t = float(s)/44100
+				t = float(s)/SAMPLE_RATE
 
 				buf[s] = int(round(max_sample*math.sin(2*math.pi*n.hz*t)))
 
