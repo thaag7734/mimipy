@@ -112,6 +112,8 @@ def mainMenu():
 			print("Now playing: '%s'" % meta.title)
 			playMusic(music, meta)
 
+			while pygame.mixer.get_busy():
+				pass
 			done = True
 		else:
 			print("File '%s' does not exist." % filename)
